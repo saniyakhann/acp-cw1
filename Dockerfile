@@ -2,15 +2,12 @@
 FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
-# Copy Maven wrapper + pom first for better caching
+# Copy everything
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
-
-# Download dependencies (cache layer)
-RUN ./mvnw -q -DskipTests dependency:go-offline
-
-# Copy source and build
 COPY src src
+
+# Build
 RUN ./mvnw -DskipTests clean package
 
 # ---- Run stage ----
@@ -24,4 +21,3 @@ EXPOSE 8080
 
 # Run Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
