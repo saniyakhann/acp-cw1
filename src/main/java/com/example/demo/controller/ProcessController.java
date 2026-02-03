@@ -67,4 +67,26 @@ public class ProcessController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/copy-content/dynamo/{table}")
+    public ResponseEntity<?> copyContentDynamo(@PathVariable String table) {
+        try {
+            List<Map<String, Object>> rows = postgresService.getAllFromTable(table);
+            dynamoDBService.writeItemsWithUUID(rows);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/copy-content/S3/{table}")
+    public ResponseEntity<?> copyContentS3(@PathVariable String table) {
+        try {
+            List<Map<String, Object>> rows = postgresService.getAllFromTable(table);
+            s3Service.writeObjectsWithUUID(rows);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

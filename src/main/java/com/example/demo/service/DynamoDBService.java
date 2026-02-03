@@ -57,9 +57,29 @@ public class DynamoDBService {
         if (value.bool() != null) return value.bool();
         return null;
     }
+
     public void writeItems(List<Map<String, Object>> items) {
         for (Map<String, Object> item : items) {
             Map<String, AttributeValue> attributeMap = new HashMap<>();
+            for (Map.Entry<String, Object> entry : item.entrySet()) {
+                attributeMap.put(entry.getKey(), convertToAttributeValue(entry.getValue()));
+            }
+
+            PutItemRequest putRequest = PutItemRequest.builder()
+                    .tableName("s2147128")
+                    .item(attributeMap)
+                    .build();
+
+            dynamoDbClient.putItem(putRequest);
+        }
+    }
+
+    public void writeItemsWithUUID(List<Map<String, Object>> items) {
+        for (Map<String, Object> item : items) {
+            Map<String, AttributeValue> attributeMap = new HashMap<>();
+
+            attributeMap.put("id", AttributeValue.builder().s(java.util.UUID.randomUUID().toString()).build());
+
             for (Map.Entry<String, Object> entry : item.entrySet()) {
                 attributeMap.put(entry.getKey(), convertToAttributeValue(entry.getValue()));
             }

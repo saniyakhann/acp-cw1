@@ -47,6 +47,7 @@ public class S3Service {
         ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getRequest);
         return objectMapper.readValue(response, Object.class);
     }
+
     public void writeObjects(List<Map<String, Object>> items) throws IOException {
         for (Map<String, Object> item : items) {
             String name = item.get("name").toString();
@@ -55,6 +56,21 @@ public class S3Service {
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket("s2147128")
                     .key(name)
+                    .contentType("application/json")
+                    .build();
+
+            s3Client.putObject(putRequest, software.amazon.awssdk.core.sync.RequestBody.fromBytes(json.getBytes()));
+        }
+    }
+
+    public void writeObjectsWithUUID(List<Map<String, Object>> items) throws IOException {
+        for (Map<String, Object> item : items) {
+            String key = java.util.UUID.randomUUID().toString();
+            String json = objectMapper.writeValueAsString(item);
+
+            PutObjectRequest putRequest = PutObjectRequest.builder()
+                    .bucket("s2147128")
+                    .key(key)
                     .contentType("application/json")
                     .build();
 
