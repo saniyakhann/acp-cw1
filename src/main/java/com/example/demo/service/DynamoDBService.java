@@ -57,4 +57,37 @@ public class DynamoDBService {
         if (value.bool() != null) return value.bool();
         return null;
     }
+    public void writeItems(List<Map<String, Object>> items) {
+        for (Map<String, Object> item : items) {
+            Map<String, AttributeValue> attributeMap = new HashMap<>();
+            for (Map.Entry<String, Object> entry : item.entrySet()) {
+                attributeMap.put(entry.getKey(), convertToAttributeValue(entry.getValue()));
+            }
+
+            PutItemRequest putRequest = PutItemRequest.builder()
+                    .tableName("s2147128")
+                    .item(attributeMap)
+                    .build();
+
+            dynamoDbClient.putItem(putRequest);
+        }
+    }
+
+    private AttributeValue convertToAttributeValue(Object value) {
+        if (value instanceof String) {
+            return AttributeValue.builder().s((String) value).build();
+        } else if (value instanceof Number) {
+            return AttributeValue.builder().n(value.toString()).build();
+        } else if (value instanceof Boolean) {
+            return AttributeValue.builder().bool((Boolean) value).build();
+        } else if (value instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) value;
+            Map<String, AttributeValue> converted = new HashMap<>();
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                converted.put(entry.getKey(), convertToAttributeValue(entry.getValue()));
+            }
+            return AttributeValue.builder().m(converted).build();
+        }
+        return AttributeValue.builder().s(value.toString()).build();
+    }
 }
