@@ -81,10 +81,7 @@ public class DynamoDBService {
             attributeMap.put("id", AttributeValue.builder().s(java.util.UUID.randomUUID().toString()).build());
 
             for (Map.Entry<String, Object> entry : item.entrySet()) {
-		if (!entry.getKey().equals("id")) {
                 attributeMap.put(entry.getKey(), convertToAttributeValue(entry.getValue()));
-            }
-	   
             }
 
             PutItemRequest putRequest = PutItemRequest.builder()
